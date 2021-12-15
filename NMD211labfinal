@@ -1,0 +1,123 @@
+/*
+NAME: Gavin Allen
+LAB: 13
+DATE: 12/10/2021
+ASSIGNMENT: Lab Final
+TASK: Follow tutorial for seven segment display 
+
+STEPS:
+Add const int global varibales for each segment 
+Add add boolean global variable for future true/false statements
+Add another global variable for button pins
+Add more global variables for the things that will change over time when triggered
+Add pin modes
+Add "void loop"
+Add digital readers to void loop so that the numbers can be seen on the display as they increment up and down
+Add check button pressed to make sure that the buttons are being pressed
+Add if statements for when the buttons are pressed 
+Add display digit to the loop so that when the button is pressed, the number will be displayed
+Add Incbuttonpressed so that the cincremented button presses can be checked and then checked against each other in order for the program to know which button was just pressed and what the current number is
+*/
+
+const int a = 8;  //displays segment "a"
+const int b = 9;  //displays segment "b"
+const int c = 4;  //displays segment "c"
+const int d = 5;  //displays segment "d"
+const int e = 6;  //displays segment "e"
+const int f = 2;  //displays segment "f"
+const int g = 3;  //displays  segment "g"
+bool bPress = false; //global variable for bPress which is equal to false
+const int IncbuttonPin = 10;
+const int DecbuttonPin = 11;
+int buttonPushCounter = 0;   //counter for the number of button presses
+int IncbuttonState = 0;      //current state of button
+int lastIncbuttonState = 0;  //previous state of button
+int DecbuttonState = 0;      //current state of button
+int lastDecbuttonState = 0;  //previous state of button
+void setup() {
+  pinMode(a, OUTPUT);  //a
+  pinMode(b, OUTPUT);  //b
+  pinMode(c, OUTPUT);  //c
+  pinMode(d, OUTPUT);  //d
+  pinMode(e, OUTPUT);  //e
+  pinMode(f, OUTPUT);  //f
+  pinMode(g, OUTPUT);  //g
+  pinMode( IncbuttonPin , INPUT_PULLUP );
+  pinMode( DecbuttonPin , INPUT_PULLUP );
+  Serial.begin(9600);  
+  displayDigit(buttonPushCounter);  
+}
+void loop() {  //loop checking for button press
+   IncbuttonState = digitalRead(IncbuttonPin);
+   DecbuttonState = digitalRead(DecbuttonPin);
+   checkIncButtonPress();
+   checkDecButtonPress();  
+  if( bPress ){
+    bPress = false;
+     turnOff();
+     displayDigit(buttonPushCounter);
+  }
+}
+void checkIncButtonPress() //loop looking for incremented button press
+{
+  if (IncbuttonState != lastIncbuttonState) { //if statement checking for last incremented button state
+    if (IncbuttonState == LOW) { //button press is high, the display is on
+      bPress = true;
+      buttonPushCounter++;
+      if( buttonPushCounter > 9) buttonPushCounter =0 ;
+      Serial.println("on");      
+    } else {
+      Serial.println("off");
+    }
+    delay(50); //add delay to avoid display looking incorrect
+  }
+  lastIncbuttonState = IncbuttonState;
+}
+void checkDecButtonPress()
+{
+  if (DecbuttonState != lastDecbuttonState) { //comparing the IncbuttonState to its previous state
+    if (DecbuttonState == LOW) { // if the state has changed, this will increment the counter
+      bPress = true; // if the current state is high then the button went from off to on
+      buttonPushCounter--;
+      if( buttonPushCounter < 0) buttonPushCounter =9 ;
+      Serial.println("on");      
+    } else {
+      Serial.println("off");
+    }
+    delay(50); //add delay to avoid display looking incorrect
+  }
+  lastDecbuttonState = DecbuttonState;
+}  
+void displayDigit(int digit)
+{
+ //conditions for displaying segment a
+ if(digit!=1 && digit != 4)
+ digitalWrite(a,HIGH);
+ //conditions for displaying segment b
+ if(digit != 5 && digit != 6)
+ digitalWrite(b,HIGH);
+ //conditions for displaying segment c
+ if(digit !=2)
+ digitalWrite(c,HIGH);
+ //conditions for displaying segment d
+ if(digit != 1 && digit !=4 && digit !=7)
+ digitalWrite(d,HIGH);
+ //conditions for displaying segment e 
+ if(digit == 2 || digit ==6 || digit == 8 || digit==0)
+ digitalWrite(e,HIGH);
+ //conditions for displaying segment f
+ if(digit != 1 && digit !=2 && digit!=3 && digit !=7)
+ digitalWrite(f,HIGH);
+ if (digit!=0 && digit!=1 && digit !=7)
+ digitalWrite(g,HIGH);
+}
+void turnOff()
+{
+  digitalWrite(a,LOW);
+  digitalWrite(b,LOW);
+  digitalWrite(c,LOW);
+  digitalWrite(d,LOW);
+  digitalWrite(e,LOW);
+  digitalWrite(f,LOW);
+  digitalWrite(g,LOW);
+}
